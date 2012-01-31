@@ -7,6 +7,7 @@ path  	= require 'path'
 async  	= require 'async'
 md5    	= require 'MD5'
 restler	= require 'restler'
+xml2js 	= require 'xml2js'
 
 argv = require('optimist').
 	usage(
