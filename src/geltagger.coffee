@@ -31,6 +31,9 @@ argv = require('optimist').
 	).options('w',
 		description: 'Watches the input directory for files'
 		alias: 'watch'
+	).options('x',
+		description: 'Deletes the original source file after successfully tagging'
+		alias: 'delete-source'
 	).argv
 
 # Utilities
@@ -55,6 +58,7 @@ outputDirectory = argv.o
 interval = argv.t
 imagemagickConvertPath = argv.p
 watch = argv.w
+deleteSource = argv.x
 
 # Constants
 
@@ -146,17 +150,28 @@ tagFile = (filename, inDir, outDir, cb) ->
 
 			{tags, source} = parsedPostData
 			iptcText = generateIPTCText(tags, source)
-			writeTags inFile, outFile, iptcText, cb
+			writeTags inFile, outFile, iptcText, (err) ->
+				fs.unlinkSync inFile if deleteSource and not err?
+				cb(err)
 
 
 tagDirectory = (inDir, outDir, cb) ->
 	fs.readdir inDir, (err, files) ->
 		return cb(err) if err?
-		errors = null
+		errorCount = 0
 		async.forEach files, ((filename, cb) ->
 			console.log "Tagging file: #{filename}"
-			tagFile(filename, inDir, outDir, cb)
-		), cb
+			tagFile(filename, inDir, outDir, (err) ->
+				if err?
+					console.error "#{err}"
+					errorCount++
+				# Don't pass the errors upwards to async.forEach
+				cb()
+			)
+		), (err) ->
+			return cb(err) if err?
+			return cb("Tagging failed on #{errorCount} files.") if errorCount > 0
+			return cb()
 
 watchDirectory = do ->
 	changedFiles = {}

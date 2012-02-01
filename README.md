@@ -19,3 +19,6 @@ Specify the path to the ImageMagick `convert` tool.
 
 ### Watch (-w, --watch)
 Add this option to watch the input directory for new files instead of running through the file list once.
+
+### Delete source (-x, --delete-source)
+Add this option to delete the original source file after successfully tagging.

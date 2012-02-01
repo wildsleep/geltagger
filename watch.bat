@@ -1,1 +1,1 @@
-node build\geltagger.js -d %1 -o %2 --convert-path="C:\Program Files (x86)\ImageMagick-6.6.3-Q16\convert.exe" -w
+node build\geltagger.js -d %1 -o %2 --convert-path="C:\Program Files (x86)\ImageMagick-6.6.3-Q16\convert.exe" -x -w
