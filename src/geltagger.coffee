@@ -38,6 +38,8 @@ argv = require('optimist').
 
 # Utilities
 
+RegExp.quote = (str) -> str.replace(/([.?*+^$[\]\\(){}-])/g, "\\$1")
+
 mixin = (target, source) ->
 	source ?= {}
 	target[key] = source[key] for key in Object.keys(source)
@@ -50,6 +52,12 @@ reject = (arr, pred) ->
 
 trim = (str) ->
 	str.replace(/^\s+/, '').replace(/\s+$/, '')
+
+changeExt = (filename, ext) ->
+	oldExt = path.extname(filename)
+	if oldExt is "" then return filename + ext
+	return filename.replace(new RegExp(RegExp.quote(oldExt) + '$'), ext)
+
 
 # Options
 
@@ -138,7 +146,7 @@ getData = (postData) ->
 
 tagFile = (filename, inDir, outDir, cb) ->
 	inFile = path.join(inDir, filename)
-	outFile = path.join(outDir, filename)
+	outFile = path.join(outDir, changeExt(filename, ".jpg"))
 	fs.readFile inFile, (err, fileContents) ->
 		return cb(err) if err?
 		hash = md5(fileContents)
